@@ -173,7 +173,11 @@ def convert_one(path, out_dir, force=False):
 
 
 def collect_inputs(argv):
-    files = [a for a in argv if not a.startswith('-')]
+    args = list(argv)
+    if '--out' in args:
+        i = args.index('--out')
+        del args[i:i + 2]
+    files = [a for a in args if not a.startswith('-')]
     if files:
         return [f for f in files if os.path.isfile(f)]
     rom_dir = os.path.join(HERE, 'rom')
