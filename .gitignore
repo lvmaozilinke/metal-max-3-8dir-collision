@@ -2,3 +2,4 @@ rom/*.nds
 output/
 __pycache__/
 *.pyc
+rom/*.sav

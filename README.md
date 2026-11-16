@@ -15,6 +15,42 @@ movement and per-axis wall collision**. No ROM is included — you need your own
 
 ---
 
+## 功能来源：把《重装机兵2 重制版》的斜向移动移植到 3 代
+
+**这套补丁做的事情，就是把《重装机兵2 重制版》（Metal Max 2 Reloaded / MM2R，NDS）
+里的“八方向移动 + 逐轴碰撞”表现，移植到《重装机兵3》上。**
+
+2R 和 3 代用的是同一套引擎家族，但 2R 原生支持八方向移动，3 代只做了四方向：
+斜向输入会被拆成“先横后竖”或“先竖后横”，撞墙时整步被吃掉，所以斜着走会卡、
+会穿墙、会“倒着走”。本工具做的事就是把这个手感找回来：
+
+- **八方向移动**：斜向速度归一化（不加速），八个方向都能连续行走；
+- **逐轴碰撞**：横、竖两个轴分别判定、分别提交，斜向贴墙时不穿墙、可沿墙滑行，
+  并且记录上一步哪个轴被挡，下一步自动调整判定顺序（所以贴上下墙、左右墙都不会卡）；
+- **斜向队列与动画同步**：三名随从的行走动画/朝向与队长同步，间距与原始四向时一致。
+
+换句话说：不是“给 3 代新发明一个斜向”，而是**把 2R 已经调好的斜向手感搬过来**。
+补丁本身是对 3 代 ARM9 代码的逆向改写（移动映射、逐轴碰撞、随从轨迹与精灵动画），
+不包含 2R 的任何数据/代码。
+
+> **What this patch actually is:** a port of the **8-direction movement + per-axis
+> collision handling of *Metal Max 2 Reloaded* (MM2R, NDS)** to *Metal Max 3*.
+> Both games share the same engine family, but MM2R already supports true diagonal
+> movement while MM3 only supports 4 directions: a diagonal input is split into
+> "horizontal then vertical" (or the other way round), the blocked axis eats the
+> whole step, so diagonal walking sticks, clips through walls and makes the
+> characters look like they walk backwards. The patch restores MM2R's handling in
+> MM3: normalized diagonal speed (no speed boost), per-axis collision with
+> separate commit per axis (no wall clipping, slides along walls, and the axis
+> order adapts to which axis was blocked on the previous step), plus the party
+> formation/animation staying in sync when walking diagonally.
+> In other words it is **a port of MM2R's already-tuned diagonal feel**, not a new
+> invention for MM3. The patch itself is a reverse-engineered rewrite of MM3's
+> ARM9 code (input-to-move mapping, per-axis collision, follower trail and sprite
+> animation); it contains no data or code from MM2R.
+
+---
+
 ## ⚠️ 已知限制：联机功能不可用
 
 **这个修复版只适合单机游玩，联机（通信）功能会失效。**
@@ -136,6 +172,10 @@ python mm3_8dir.py --force             :: 补丁点不匹配也强行写入（�
 
 `一键转换_八方向.bat` (double-click) converts every `.nds` in `rom/` into the
 8-direction / per-axis-collision fixed build; results go to `output/`.
+The feature itself is **ported from *Metal Max 2 Reloaded* (MM2R)**: MM2R already
+has true 8-direction movement with per-axis collision, MM3 only has 4 directions,
+and this tool brings MM2R's diagonal handling over to MM3 (normalized diagonal
+speed, no wall clipping, per-axis commit, follower formation/animation in sync).
 Requires Python 3.8+. Only the ARM9 area of the ROM is rewritten (verified
 byte-for-byte against the released build 版21). Works on the Japanese original,
 the Chinese translation and the English fan translation.
