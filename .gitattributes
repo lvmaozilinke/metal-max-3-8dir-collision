@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.bat text eol=crlf
+*.py text
+*.md text
+*.nds binary
+*.sav binary
